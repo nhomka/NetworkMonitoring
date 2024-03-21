@@ -12,7 +12,7 @@ def ping(host):
     # Ping
     return os.system("ping " + ping_str + " " + host) == 0
 
-def monitor_connection(host):
+def monitor_connection(host, sleep_time):
     while True:
         seconds_lapsed = 0
         success_count = 0
@@ -30,6 +30,6 @@ def monitor_connection(host):
         with open("log.txt", "a") as file:
             file.write(f"{timestamp} - {status}\n")
 
-        time.sleep(30-seconds_lapsed)  # Wait for 30 seconds before pinging again
+        time.sleep(sleep_time-seconds_lapsed)  # Wait for 30 seconds before pinging again
 
-monitor_connection("google.com")
+monitor_connection("google.com", 60)
