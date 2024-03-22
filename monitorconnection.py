@@ -48,8 +48,8 @@ def monitor_connection(pingsettings):
             file.write(f"{timestamp} - {status} - {latency}\n")
 
         current_time = datetime.now()
-        if current_time <= datetime.now().replace(hour=0, minute=1, second=sleep_time%60) \
-        and current_time >= datetime.now().replace(hour=0, minute=0, second=sleep_time%60):
+        if current_time <= datetime.now().replace(hour=0, minute=1, second=sleeptime%60) \
+        and current_time >= datetime.now().replace(hour=0, minute=0, second=sleeptime%60):
             create_ping_latency_chart("log.txt")
             create_ping_success_chart("log.txt")
 
