@@ -4,9 +4,7 @@ import time
 from datetime import datetime
 import matplotlib.pyplot as plt
 import pandas as pd
-
-
-
+from pingsettings import pingsettings
 
 def ping(host):
     # Ping parameters as function of OS
@@ -27,11 +25,14 @@ def ping(host):
 
     return success, latency
 
-def monitor_connection(host, sleep_time):
+def monitor_connection(pingsettings):
+    host = pingsettings.pingHost
+    count = pingsettings.pingCount
+    sleeptime = pingsettings.pingInterval
     while True:
         seconds_lapsed = 0
         success_count = 0
-        for _ in range(5):
+        for _ in range(count):
             result, latency = ping(host)
             if result:
                 success_count += 1
@@ -52,7 +53,7 @@ def monitor_connection(host, sleep_time):
             create_ping_latency_chart("log.txt")
             create_ping_success_chart("log.txt")
 
-        time.sleep(sleep_time-seconds_lapsed)  # Wait for 30 seconds before pinging again
+        time.sleep(sleeptime-seconds_lapsed)  # Wait for the remaining time in the interval
 
 def create_ping_latency_chart(log_file):
     df = pd.read_csv(log_file, sep=" - ", names=["timestamp", "status", "latency"])
@@ -73,4 +74,9 @@ def create_ping_success_chart(log_file):
     plt.ylabel('Success')
     plt.savefig('Plots/Success/ping_success_chart.png')
 
-monitor_connection("google.com", 60)
+settings = pingsettings()
+settings.pingCount = 5
+settings.pingInterval = 60
+settings.pingHost = "google.com"
+
+monitor_connection(settings)
