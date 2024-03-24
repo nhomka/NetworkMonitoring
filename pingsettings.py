@@ -5,5 +5,5 @@ class pingsettings:
         self.pingInterval = 1
         self.pingSize = 32
         self.pingTTL = 128
-        self.pingType = "ICMP"
         self.pingHost = "www.google.com"
+        self.requiredSuccessfulPings = 1
