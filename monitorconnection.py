@@ -51,18 +51,19 @@ def monitor_connection(pingsettings):
             time.sleep(1)
 
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        file_timestamp = datetime.now().strftime("%Y-%m-%d")
         status = "Success" if success_count >= requiredSuccessfulPings else "Failure"
         
         with open("log.txt", "a") as file:
             file.write(f"{timestamp} - {status} - {latency}\n")
 
-        if generate_start_of_day_plots(sleeptime):
+        if is_start_of_day(sleeptime):
             create_ping_latency_chart("log.txt")
             create_ping_success_chart("log.txt")
 
         time.sleep(sleeptime-count)  # Wait for the remaining time in the interval
 
-def generate_start_of_day_plots(sleeptime):
+def is_start_of_day(sleeptime):
     current_time = datetime.now()
     return \
         current_time <= datetime.now().replace(hour=0, minute=(sleeptime//60), second = 0) and \
