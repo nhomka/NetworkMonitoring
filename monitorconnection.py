@@ -5,6 +5,7 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 import pandas as pd
 from pingsettings import pingsettings
+from emailer import send_email_report
 
 def ping(host):
     ping_str = build_ping_string(host)
@@ -55,11 +56,12 @@ def monitor_connection(pingsettings):
         status = "Success" if success_count >= requiredSuccessfulPings else "Failure"
         
         with open("log.txt", "a") as file:
-            file.write(f"{timestamp} - {status} - {latency}\n")
+            file.write(f"{timestamp},{status},{latency}\n")
 
         if is_start_of_day(sleeptime):
             create_ping_latency_chart("log.txt")
             create_ping_success_chart("log.txt")
+            send_email_report()
 
         time.sleep(sleeptime-count)  # Wait for the remaining time in the interval
 
@@ -81,7 +83,7 @@ def create_ping_success_chart(log_file):
     plot_chart('Success', df)
     
 def create_dataframe_from_log(log_file):
-    return pd.read_csv(log_file, sep=" - ", names=["timestamp", "status", "latency"])
+    return pd.read_csv(log_file, sep=",", names=["timestamp", "status", "latency"])
     
 def plot_chart(plot_name, dataframe):
     dataframe.plot(x='timestamp', y=plot_name.lower())
