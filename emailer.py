@@ -1,3 +1,4 @@
+from datetime import datetime
 import smtplib
 from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
@@ -20,10 +21,11 @@ def send_email_report():
 
     body = "Previous day's log file and charts are attached."
     message.attach(MIMEText(body, 'plain'))
+    current_date = datetime.now().strftime("%Y-%m-%d")
 
     file_attachments = ['log.txt',
-                        'Plots/Latency/ping_latency_chart.png',
-                        'Plots/Success/ping_success_chart.png']
+                        f'Plots/Latency/{current_date}-ping_latency_chart.png',
+                        f'Plots/Success/{current_date}-ping_success_chart.png']
 
     for file in file_attachments:
         with open(file, "rb") as f:

@@ -1,11 +1,12 @@
 import os
 import platform
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
 import pandas as pd
 from pingsettings import pingsettings
 from emailer import send_email_report
+from storageconfig import storageconfig
 
 class NetworkMonitor:
     def __init__(self, pingsettings):
@@ -13,6 +14,20 @@ class NetworkMonitor:
         self.count = pingsettings.pingCount
         self.sleeptime = pingsettings.pingInterval
         self.requiredSuccessfulPings = pingsettings.requiredSuccessfulPings
+
+        self.storage = storageconfig()
+        
+        self.move_log_file()
+        
+    def move_log_file(self):
+        if not os.path.exists(self.storage.log_storage_path):
+            os.makedirs(self.storage.log_storage_path)
+        current_date = self.get_current_date_string()
+        if os.path.exists("log.txt"):
+            os.rename("log.txt", f"{self.storage.log_storage_path}/{current_date}-log.txt")
+
+    def get_current_date_string(self):
+        return datetime.now().strftime("%Y-%m-%d")
 
     def monitor_connection(self):
         while True:
@@ -24,7 +39,6 @@ class NetworkMonitor:
                 time.sleep(1)
 
             timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            file_timestamp = datetime.now().strftime("%Y-%m-%d")
             status = "Success" if success_count >= self.requiredSuccessfulPings else "Failure"
             
             with open("log.txt", "a") as file:
@@ -34,6 +48,7 @@ class NetworkMonitor:
                 self.create_ping_latency_chart("log.txt")
                 self.create_ping_success_chart("log.txt")
                 send_email_report()
+                self.flush_old_logs()
 
             time.sleep(self.sleeptime-self.count)  # Wait for the remaining time in the interval
 
@@ -91,7 +106,22 @@ class NetworkMonitor:
         plt.title(f'Ping {plot_name} Over Time')
         plt.xlabel('Timestamp')
         plt.ylabel(plot_name)
-        plt.savefig(f'Plots/{plot_name}/ping_{plot_name.lower()}_chart.png')
+        plt.savefig(f'Plots/{plot_name}/{self.get_current_date_string()}-ping_{plot_name.lower()}_chart.png')
+        
+    def flush_old_logs(self):
+        storage_limit = datetime.now().date - timedelta(days=self.storage.days_of_history_to_keep)
+        for file in os.listdir(self.storage.log_storage_path):
+            if self.get_date_from_log_file(file) < storage_limit:
+                os.remove(f"{self.storage.log_storage_path}/{file}")
+        for file in os.listdir(self.storage.latency_storage_path):
+            if self.get_date_from_log_file(file) < storage_limit:
+                os.remove(f"{self.storage.latency_storage_path}/{file}")
+        for file in os.listdir(self.storage.success_storage_path):
+            if self.get_date_from_log_file(file) < storage_limit:
+                os.remove(f"{self.storage.success_storage_path}/{file}")
+                
+    def get_date_from_log_file(self, log_file):
+        return datetime.strptime(log_file.split("-")[:2], "%Y-%m-%d")
 
 settings = pingsettings()
 settings.pingCount = 5
