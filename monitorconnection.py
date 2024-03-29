@@ -17,11 +17,15 @@ class NetworkMonitor:
 
         self.storage = storageconfig()
         
+        self.check_storage_paths()
         self.move_log_file()
         
+    def check_storage_paths(self):
+        for path in [self.storage.backup_storage_path, self.storage.latency_storage_path, self.storage.success_storage_path]:
+            if not os.path.exists(path):
+                os.makedirs(path)
+        
     def move_log_file(self):
-        if not os.path.exists(self.storage.log_storage_path):
-            os.makedirs(self.storage.log_storage_path)
         current_date = self.get_current_date_string()
         if os.path.exists("log.txt"):
             os.rename("log.txt", f"{self.storage.log_storage_path}/{current_date}-log.txt")
@@ -48,7 +52,8 @@ class NetworkMonitor:
                 self.create_ping_latency_chart("log.txt")
                 self.create_ping_success_chart("log.txt")
                 send_email_report()
-                self.flush_old_logs()
+                for path in [self.storage.log_storage_path, self.storage.latency_storage_path, self.storage.success_storage_path]:
+                    self.flush_old_logs(path)
 
             time.sleep(self.sleeptime-self.count)  # Wait for the remaining time in the interval
 
@@ -108,17 +113,11 @@ class NetworkMonitor:
         plt.ylabel(plot_name)
         plt.savefig(f'Plots/{plot_name}/{self.get_current_date_string()}-ping_{plot_name.lower()}_chart.png')
         
-    def flush_old_logs(self):
+    def flush_old_logs(self, storage_path):
         storage_limit = datetime.now().date - timedelta(days=self.storage.days_of_history_to_keep)
-        for file in os.listdir(self.storage.log_storage_path):
+        for file in os.listdir(storage_path):
             if self.get_date_from_log_file(file) < storage_limit:
-                os.remove(f"{self.storage.log_storage_path}/{file}")
-        for file in os.listdir(self.storage.latency_storage_path):
-            if self.get_date_from_log_file(file) < storage_limit:
-                os.remove(f"{self.storage.latency_storage_path}/{file}")
-        for file in os.listdir(self.storage.success_storage_path):
-            if self.get_date_from_log_file(file) < storage_limit:
-                os.remove(f"{self.storage.success_storage_path}/{file}")
+                os.remove(f"{storage_path}/{file}")
                 
     def get_date_from_log_file(self, log_file):
         return datetime.strptime(log_file.split("-")[:2], "%Y-%m-%d")
