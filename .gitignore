@@ -1,5 +1,6 @@
 log.txt
 .venv*
 Plots*
+Logs*
 EmailInfo.py
 *.pyc

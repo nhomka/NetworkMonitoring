@@ -1,27 +1,31 @@
-import os
-import platform
-import time
-from datetime import datetime, timedelta
+import os, platform, time
+from datetime import datetime, timedelta, date
 import matplotlib.pyplot as plt
 import pandas as pd
 from pingsettings import pingsettings
 from emailer import send_email_report
-from storageconfig import storageconfig
+from storageconfig import StorageConfig
+from test_helper import do_not_run_in_test
 
 class NetworkMonitor:
-    def __init__(self, pingsettings):
+    def __init__(self, pingsettings = pingsettings()):
         self.host = pingsettings.pingHost
         self.count = pingsettings.pingCount
         self.sleeptime = pingsettings.pingInterval
         self.requiredSuccessfulPings = pingsettings.requiredSuccessfulPings
 
-        self.storage = storageconfig()
+        self.storage = StorageConfig()
         
+        self.initialize_storage()
+    
+    @do_not_run_in_test    
+    def initialize_storage(self):
         self.check_storage_paths()
         self.move_log_file()
-        
+    
+    #test-validated
     def check_storage_paths(self):
-        for path in [self.storage.backup_storage_path, self.storage.latency_storage_path, self.storage.success_storage_path]:
+        for path in [self.storage.log_storage_path, self.storage.latency_storage_path, self.storage.success_storage_path]:
             if not os.path.exists(path):
                 os.makedirs(path)
         
@@ -29,7 +33,8 @@ class NetworkMonitor:
         current_date = self.get_current_date_string()
         if os.path.exists("log.txt"):
             os.rename("log.txt", f"{self.storage.log_storage_path}/{current_date}-log.txt")
-
+    
+    #test-validated
     def get_current_date_string(self):
         return datetime.now().strftime("%Y-%m-%d")
 
@@ -118,14 +123,19 @@ class NetworkMonitor:
         for file in os.listdir(storage_path):
             if self.get_date_from_log_file(file) < storage_limit:
                 os.remove(f"{storage_path}/{file}")
-                
+    
+    #test-validated
     def get_date_from_log_file(self, log_file):
-        return datetime.strptime(log_file.split("-")[:2], "%Y-%m-%d")
+        try:
+            test = datetime.strptime(log_file[:10], "%Y-%m-%d").date()
+            return test
+        except:
+            return datetime.now().date()
 
-settings = pingsettings()
-settings.pingCount = 5
-settings.pingInterval = 60
-settings.pingHost = "google.com"
+#settings = pingsettings()
+#settings.pingCount = 5
+#settings.pingInterval = 60
+#settings.pingHost = "google.com"
 
-monitor = NetworkMonitor(settings)
-monitor.monitor_connection()
+#monitor = NetworkMonitor(settings)
+#monitor.monitor_connection()
