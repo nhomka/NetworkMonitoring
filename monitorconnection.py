@@ -2,13 +2,13 @@ import os, platform, time
 from datetime import datetime, timedelta, date
 import matplotlib.pyplot as plt
 import pandas as pd
-from pingsettings import pingsettings
+from pingsettings import PingSettings
 from emailer import send_email_report
 from storageconfig import StorageConfig
 from test_helper import do_not_run_in_test
 
 class NetworkMonitor:
-    def __init__(self, pingsettings = pingsettings()):
+    def __init__(self, pingsettings = PingSettings()):
         self.host = pingsettings.pingHost
         self.count = pingsettings.pingCount
         self.sleeptime = pingsettings.pingInterval
@@ -28,7 +28,8 @@ class NetworkMonitor:
         for path in [self.storage.log_storage_path, self.storage.latency_storage_path, self.storage.success_storage_path]:
             if not os.path.exists(path):
                 os.makedirs(path)
-        
+    
+    #test-validated
     def move_log_file(self):
         current_date = self.get_current_date_string()
         if os.path.exists("log.txt"):
@@ -67,10 +68,12 @@ class NetworkMonitor:
         success, latency = self.send_ping_command(ping_command)
         return success, latency
 
+    #test-validated
     def build_ping_command(self):
-        return f"ping {self.get_os_specific_ping_str()} {self.host}"
+        return f"ping {self.get_os_specific_ping()} {self.host}"
 
-    def get_os_specific_ping_str(self):
+    #test-validated
+    def get_os_specific_ping(self):
         return "-n 1" if platform.system().lower() == "windows" else "-c 1"
 
     def send_ping_command(self, ping_command):

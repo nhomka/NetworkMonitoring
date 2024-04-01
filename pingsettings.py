@@ -1,4 +1,4 @@
-class pingsettings:
+class PingSettings:
     def __init__(self):
         self.pingCount = 4
         self.pingTimeout = 2
