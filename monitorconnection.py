@@ -13,8 +13,6 @@ class NetworkMonitor:
         self.count = pingsettings.pingCount
         self.sleeptime = pingsettings.pingInterval
         self.requiredSuccessfulPings = pingsettings.requiredSuccessfulPings
-
-        self.storage = StorageConfig()
         
         self.initialize_storage()
     
@@ -25,15 +23,15 @@ class NetworkMonitor:
     
     #test-validated
     def check_storage_paths(self):
-        for path in [self.storage.log_storage_path, self.storage.latency_storage_path, self.storage.success_storage_path]:
+        for path in StorageConfig.storage_directories:
             if not os.path.exists(path):
                 os.makedirs(path)
     
     #test-validated
     def move_log_file(self):
         current_date = self.get_current_date_string()
-        if os.path.exists("log.txt"):
-            os.rename("log.txt", f"{self.storage.log_storage_path}/{current_date}-log.txt")
+        if os.path.exists(StorageConfig.log_file_name):
+            os.rename(StorageConfig.log_file_name, f"{StorageConfig.log_storage_path}/{current_date}-log.txt")
     
     #test-validated
     def get_current_date_string(self):
@@ -41,27 +39,29 @@ class NetworkMonitor:
 
     def monitor_connection(self):
         while True:
-            success_count = 0
-            for _ in range(self.count):
-                result, latency = self.ping()
-                if result:
-                    success_count += 1
-                time.sleep(1)
-
-            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            status = "Success" if success_count >= self.requiredSuccessfulPings else "Failure"
-            
-            with open("log.txt", "a") as file:
-                file.write(f"{timestamp},{status},{latency}\n")
+            self.send_ping_and_log_results()
 
             if self.is_start_of_day():
-                self.create_ping_latency_chart("log.txt")
-                self.create_ping_success_chart("log.txt")
+                self.create_ping_latency_chart(StorageConfig.log_file_name)
+                self.create_ping_success_chart(StorageConfig.log_file_name)
                 send_email_report()
-                for path in [self.storage.log_storage_path, self.storage.latency_storage_path, self.storage.success_storage_path]:
-                    self.flush_old_logs(path)
+                self.flush_old_logs()
 
             time.sleep(self.sleeptime-self.count)  # Wait for the remaining time in the interval
+
+    def send_ping_and_log_results(self):
+        success_count = 0
+        for _ in range(self.count):
+            result, latency = self.ping()
+            if result:
+                success_count += 1
+            time.sleep(1)
+
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        status = "Success" if success_count >= self.requiredSuccessfulPings else "Failure"
+        
+        with open(StorageConfig.log_file_name, "a") as file:
+            file.write(f"{timestamp},{status},{latency}\n")
 
     def ping(self):
         ping_command = self.build_ping_command()
@@ -121,24 +121,28 @@ class NetworkMonitor:
         plt.ylabel(plot_name)
         plt.savefig(f'Plots/{plot_name}/{self.get_current_date_string()}-ping_{plot_name.lower()}_chart.png')
         
-    def flush_old_logs(self, storage_path):
-        storage_limit = datetime.now().date - timedelta(days=self.storage.days_of_history_to_keep)
-        for file in os.listdir(storage_path):
+    def flush_old_logs(self):
+        for directory in StorageConfig.storage_directories:
+            self.delete_old_files_from_directory(directory)
+    
+    def delete_old_files_from_directory(self, path):
+        storage_limit = datetime.now().date - timedelta(days=StorageConfig.days_of_history_to_keep)
+        for file in os.listdir(path):
             if self.get_date_from_log_file(file) < storage_limit:
-                os.remove(f"{storage_path}/{file}")
+                os.remove(f"{path}/{file}")
     
     #test-validated
     def get_date_from_log_file(self, log_file):
         try:
-            test = datetime.strptime(log_file[:10], "%Y-%m-%d").date()
-            return test
+            file_date = datetime.strptime(log_file[:10], "%Y-%m-%d").date()
+            return file_date
         except:
             return datetime.now().date()
 
-#settings = pingsettings()
-#settings.pingCount = 5
-#settings.pingInterval = 60
-#settings.pingHost = "google.com"
+settings = PingSettings()
+settings.pingCount = 5
+settings.pingInterval = 60
+settings.pingHost = "google.com"
 
-#monitor = NetworkMonitor(settings)
-#monitor.monitor_connection()
+monitor = NetworkMonitor(settings)
+monitor.monitor_connection()
