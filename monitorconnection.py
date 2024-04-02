@@ -30,8 +30,9 @@ class NetworkMonitor:
     #test-validated
     def move_log_file(self):
         current_date = self.get_current_date_string()
-        if os.path.exists(StorageConfig.log_file_name):
-            os.rename(StorageConfig.log_file_name, f"{StorageConfig.log_storage_path}/{current_date}-log.txt")
+        new_log_path = f"{StorageConfig.log_storage_path}/{current_date}-log.txt"
+        if os.path.exists(StorageConfig.log_file_name) and not os.path.exists(new_log_path):
+            os.rename(StorageConfig.log_file_name, new_log_path)
     
     #test-validated
     def get_current_date_string(self):
@@ -138,11 +139,3 @@ class NetworkMonitor:
             return file_date
         except:
             return datetime.now().date()
-
-settings = PingSettings()
-settings.pingCount = 5
-settings.pingInterval = 60
-settings.pingHost = "google.com"
-
-monitor = NetworkMonitor(settings)
-monitor.monitor_connection()
