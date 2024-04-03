@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from pingsettings import PingSettings
 from emailer import send_email_report
-from file_storage_configuration import initialize_storage, log_file_name, clean_old_logs
+from file_storage_configuration import log_file_name, clean_old_logs
 from datetime_functions import current_date_string, is_start_of_day
 
 class NetworkMonitor:
@@ -13,8 +13,6 @@ class NetworkMonitor:
         self.count = pingsettings.pingCount
         self.sleeptime = pingsettings.pingInterval
         self.requiredSuccessfulPings = pingsettings.requiredSuccessfulPings
-        
-        initialize_storage()
 
     def monitor_connection(self):
         while True:
@@ -26,18 +24,13 @@ class NetworkMonitor:
                 send_email_report()
                 clean_old_logs()
 
-            time.sleep(self.sleeptime-self.count)  # Wait for the remaining time in the interval
+            time.sleep(self.sleeptime)  # Wait for the remaining time in the interval
 
     def send_ping_and_log_results(self):
-        success_count = 0
-        for _ in range(self.count):
-            result, latency = self.ping()
-            if result:
-                success_count += 1
-            time.sleep(1)
+        result, latency = self.ping()
 
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        status = "Success" if success_count >= self.requiredSuccessfulPings else "Failure"
+        status = "Success" if result else "Failure"
         
         with open(log_file_name, "a") as file:
             file.write(f"{timestamp},{status},{latency}\n")
