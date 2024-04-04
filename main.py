@@ -1,14 +1,16 @@
 from monitorconnection import NetworkMonitor
 from pingsettings import PingSettings
 import file_storage_configuration
+from pinger import get_pinger_class
 
 if __name__ == "__main__":
     settings = PingSettings()
-    settings.pingCount = 5
-    settings.pingInterval = 60
-    settings.pingHost = "google.com"
+    settings.pingAttempts = 5
+    settings.interval = 60
+    settings.host = "google.com"
 
     file_storage_configuration.initialize_storage()
 
-    monitor = NetworkMonitor(settings)
+    pinger = get_pinger_class(settings)
+    monitor = NetworkMonitor(pinger)
     monitor.monitor_connection()

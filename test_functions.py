@@ -7,13 +7,16 @@ from freezegun import freeze_time
 import file_storage_configuration
 from pingsettings import PingSettings
 import datetime_functions
+from pinger import get_pinger_class
 
 os.environ['ENV'] = 'test'
-mockNetworkMonitor = NetworkMonitor()
 mockPingSettings = PingSettings()
+mockPinger = get_pinger_class(mockPingSettings)
+mockNetworkMonitor = NetworkMonitor()
 
 storage_directories = file_storage_configuration.storage_directories
 log_storage_path = file_storage_configuration.log_storage_path
+log_file_name = file_storage_configuration.log_file_name
 
 # Test cases for the NetworkMonitor class
 @freeze_time("2024-03-25")
@@ -46,7 +49,7 @@ def test_move_log_file(fs):
     current_date = datetime.datetime.now().strftime("%Y-%m-%d")
     os.makedirs(log_storage_path)
     destination_path = f"{log_storage_path}/{current_date}-log.txt"
-    origin_path = "log.txt"
+    origin_path = log_file_name
     
     # Test when log file does not exist
     assert os.path.exists(destination_path) == False
@@ -58,7 +61,7 @@ def test_move_log_file(fs):
     assert os.path.exists(origin_path) == False
     
     # Test when log file exists
-    os.makedirs("log.txt")
+    os.makedirs(log_file_name)
     assert os.path.exists(destination_path) == False
     assert os.path.exists(origin_path) == True
     
@@ -67,21 +70,15 @@ def test_move_log_file(fs):
     assert os.path.exists(destination_path) == True
     assert os.path.exists(origin_path) == False
     
-def test_build_ping_string_windows():
+def test_get_ping_command_windows():
     platform.system = lambda: "Windows"
-    assert mockNetworkMonitor.build_ping_command() == f"ping -n 1 www.google.com"
+    mockPinger = get_pinger_class(mockPingSettings)
+    assert mockPinger._get_ping_command() == f"ping -n 1 www.google.com"
     
-def test_build_ping_string_linux():
+def test_get_ping_command_linux():
     platform.system = lambda: "Linux"
-    assert mockNetworkMonitor.build_ping_command() == f"ping -c 1 www.google.com"
-    
-def test_get_os_specific_ping_string_windows():
-    platform.system = lambda: "Windows"
-    assert mockNetworkMonitor.get_os_specific_ping() == "-n 1"
-    
-def test_get_os_specific_ping_string_linux():
-    platform.system = lambda: "Linux"
-    assert mockNetworkMonitor.get_os_specific_ping() == "-c 1"
+    mockPinger = get_pinger_class(mockPingSettings)
+    assert mockPinger._get_ping_command() == f"ping -c 1 www.google.com"
     
 def test_date_to_remove_old_files():
     assert datetime_functions.date_to_remove_old_files(28) == datetime.datetime.now().date() - datetime.timedelta(days=28)

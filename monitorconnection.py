@@ -4,19 +4,18 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from pingsettings import PingSettings
 from emailer import send_email_report
-from file_storage_configuration import log_file_name, clean_old_logs
+from file_storage_configuration import log_file_name, clean_old_logs, plots_storage_path
 from datetime_functions import current_date_string, is_start_of_day
+from pinger import Pinger, WindowsPinger, LinuxPinger
 
 class NetworkMonitor:
-    def __init__(self, pingsettings = PingSettings()):
-        self.host = pingsettings.pingHost
-        self.count = pingsettings.pingCount
-        self.sleeptime = pingsettings.pingInterval
-        self.requiredSuccessfulPings = pingsettings.requiredSuccessfulPings
+    def __init__(self, pinger = None):
+        self.pinger = (WindowsPinger() if platform.system().lower() == "windows" else LinuxPinger()) if pinger is None else pinger
 
     def monitor_connection(self):
         while True:
-            self.send_ping_and_log_results()
+            success, latency = self.pinger.ping()
+            self.log_results(success, latency)
 
             if is_start_of_day(self.sleeptime):
                 self.create_ping_latency_chart(log_file_name)
@@ -26,14 +25,10 @@ class NetworkMonitor:
 
             time.sleep(self.sleeptime)  # Wait for the remaining time in the interval
 
-    def send_ping_and_log_results(self):
-        result, latency = self.ping()
-
+    def log_results(self, success, latency):
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        status = "Success" if result else "Failure"
-        
         with open(log_file_name, "a") as file:
-            file.write(f"{timestamp},{status},{latency}\n")
+            file.write(f"{timestamp},{success},{latency}\n")
 
     def ping(self):
         ping_command = self.build_ping_command()
@@ -85,5 +80,5 @@ class NetworkMonitor:
         plt.title(f'Ping {plot_name} Over Time')
         plt.xlabel('Timestamp')
         plt.ylabel(plot_name)
-        plt.savefig(f'Plots/{plot_name}/{current_date_string()}-ping_{plot_name.lower()}_chart.png')
+        plt.savefig(f'{plots_storage_path}/{plot_name}/{current_date_string()}-ping_{plot_name.lower()}_chart.png')
     

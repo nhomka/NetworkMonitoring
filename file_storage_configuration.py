@@ -8,6 +8,7 @@ days_of_history_per_file = 1
 base_storage_path = os.environ["ProgramFiles"] if os.name == "nt" else os.environ["HOME"]
 app_storage_path = f"{base_storage_path}/NetworkMonitor"
 
+plots_storage_path = app_storage_path + "/Plots"
 latency_storage_path = app_storage_path + "/Plots/Latency"
 success_storage_path = app_storage_path + "/Plots/Success"
 log_storage_path = app_storage_path + "/Logs"

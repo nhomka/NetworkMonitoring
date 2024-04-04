@@ -1,9 +1,9 @@
 class PingSettings:
     def __init__(self):
-        self.pingCount = 4
-        self.pingTimeout = 2
-        self.pingInterval = 1
-        self.pingSize = 32
-        self.pingTTL = 128
-        self.pingHost = "www.google.com"
+        self.pingAttempts = 4
+        self.timeout = 2
+        self.interval = 1
+        self.packetSize = 32
+        self.TTL = 128
+        self.host = "www.google.com"
         self.requiredSuccessfulPings = 1
