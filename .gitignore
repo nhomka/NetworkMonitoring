@@ -7,3 +7,4 @@ EmailInfo.py
 
 # Test Development Files
 TESTFILE.py
+.coverage

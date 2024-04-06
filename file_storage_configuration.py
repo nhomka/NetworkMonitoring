@@ -1,5 +1,5 @@
 import os
-from Testing.test_helper import do_not_run_in_test
+from test_helper import do_not_run_in_test
 from datetime_functions import current_date_string, date_to_remove_old_files, get_date_from_log_file
 from file_paths import *
 
