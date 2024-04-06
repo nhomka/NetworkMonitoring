@@ -24,6 +24,7 @@ class Pinger:
 
     def _send_ping_command(self, ping_command):
         response = os.popen(ping_command).read()
+        print(response)
         return response
 
     def _is_ping_successful(self, ping_response):

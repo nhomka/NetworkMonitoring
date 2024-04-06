@@ -1,7 +1,6 @@
 from monitorconnection import NetworkMonitor
 from pingsettings import PingSettings
 import file_storage_configuration
-from pinger import get_pinger_class
 
 if __name__ == "__main__":
     settings = PingSettings()
@@ -11,6 +10,5 @@ if __name__ == "__main__":
 
     file_storage_configuration.initialize_storage()
 
-    pinger = get_pinger_class(settings)
-    monitor = NetworkMonitor(pinger)
+    monitor = NetworkMonitor(settings)
     monitor.monitor_connection()

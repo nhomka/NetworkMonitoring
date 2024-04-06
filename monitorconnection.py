@@ -6,60 +6,30 @@ from pingsettings import PingSettings
 from emailer import send_email_report
 from file_storage_configuration import log_file_name, clean_old_logs, plots_storage_path
 from datetime_functions import current_date_string, is_start_of_day
-from pinger import Pinger, WindowsPinger, LinuxPinger
+from pinger import get_pinger_class
 
 class NetworkMonitor:
-    def __init__(self, pinger = None):
-        self.pinger = (WindowsPinger() if platform.system().lower() == "windows" else LinuxPinger()) if pinger is None else pinger
+    def __init__(self, pingsettings = PingSettings()):
+        self.settings = pingsettings
+        self.pinger = get_pinger_class(self.settings)
 
     def monitor_connection(self):
         while True:
             success, latency = self.pinger.ping()
             self.log_results(success, latency)
 
-            if is_start_of_day(self.sleeptime):
+            if is_start_of_day(self.settings.interval):
                 self.create_ping_latency_chart(log_file_name)
                 self.create_ping_success_chart(log_file_name)
                 send_email_report()
                 clean_old_logs()
 
-            time.sleep(self.sleeptime)  # Wait for the remaining time in the interval
+            time.sleep(self.settings.interval)  # Wait for the remaining time in the interval
 
     def log_results(self, success, latency):
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         with open(log_file_name, "a") as file:
             file.write(f"{timestamp},{success},{latency}\n")
-
-    def ping(self):
-        ping_command = self.build_ping_command()
-        success, latency = self.send_ping_command(ping_command)
-        return success, latency
-
-    #test-validated
-    def build_ping_command(self):
-        return f"ping {self.get_os_specific_ping()} {self.host}"
-
-    #test-validated
-    def get_os_specific_ping(self):
-        return "-n 1" if platform.system().lower() == "windows" else "-c 1"
-
-    def send_ping_command(self, ping_command):
-        success = self.is_ping_successful(ping_command)
-        latency = self.get_ping_latency(ping_command) if success else 0
-        return success, latency
-
-    def is_ping_successful(self, ping_command):
-        response = os.system(ping_command)
-        return response == 0
-
-    def get_ping_latency(self, ping_str):
-        if platform.system().lower() == "windows":
-            output = os.popen(ping_str).read()
-            latency = float(output.split("Average = ")[1].split("ms")[0])
-        else:
-            output = os.popen(ping_str).read()
-            latency = float(output.split("time=")[1].split(" ")[0])
-        return latency
             
     def create_ping_latency_chart(self, log_file):
         df = self.create_dataframe_from_log(log_file)

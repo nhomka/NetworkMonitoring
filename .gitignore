@@ -1,7 +1,9 @@
-log.txt
+# Byte-compiled / optimized / DLL files
 .venv*
-Plots*
-Logs*
-EmailInfo.py
 *.pyc
+
+# Config Files
+EmailInfo.py
+
+# Test Development Files
 TESTFILE.py

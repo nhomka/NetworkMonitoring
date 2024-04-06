@@ -5,6 +5,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from EmailInfo import EmailInfo
 from os.path import basename
+from file_storage_configuration import log_file_name, success_storage_path, latency_storage_path
 
 smtp_server = EmailInfo.smtp_server
 smtp_port = EmailInfo.smtp_port
@@ -21,11 +22,8 @@ def send_email_report():
 
     body = "Previous day's log file and charts are attached."
     message.attach(MIMEText(body, 'plain'))
-    current_date = datetime.now().strftime("%Y-%m-%d")
 
-    file_attachments = ['log.txt',
-                        f'Plots/Latency/{current_date}-ping_latency_chart.png',
-                        f'Plots/Success/{current_date}-ping_success_chart.png']
+    file_attachments = get_file_attachments()
 
     for file in file_attachments:
         with open(file, "rb") as f:
@@ -43,3 +41,9 @@ def send_email_report():
         server.send_message(message)
 
     print("Email sent successfully")
+    
+def get_file_attachments():
+    current_date = datetime.now().strftime("%Y-%m-%d")
+    return [log_file_name,
+            f'{latency_storage_path}/{current_date}-ping_latency_chart.png',
+            f'{success_storage_path}/{current_date}-ping_success_chart.png']
