@@ -3,33 +3,35 @@ import smtplib
 from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from EmailInfo import EmailInfo
+from emailinfo import EmailInfo
 from os.path import basename
 from file_paths import log_file_name, success_storage_path, latency_storage_path
 
 def send_email_report():
-    message = build_email_message()
-    file_attachments = get_file_attachments()
-    attach_files_to_email(message, file_attachments)
-    send_email(message)
+    message = _build_email_message()
+    file_attachments = _get_file_attachments()
+    _attach_files_to_message(message, file_attachments)
+    _send_email(message)
 
-def build_email_message():
+# test-validated
+def _build_email_message() -> MIMEMultipart:
     message = MIMEMultipart()
     message['From'] = EmailInfo.sender_email
     message['To'] = EmailInfo.receiver_email
-    message['Subject'] = 'Daily Network Monitoring Report'
+    message['Subject'] = EmailInfo.subject_line
 
-    body = "Previous day's log file and charts are attached."
+    body = EmailInfo.message_body
     message.attach(MIMEText(body, 'plain'))
     return message
     
-def get_file_attachments():
+
+def _get_file_attachments() -> list[str]:
     current_date = datetime.now().strftime("%Y-%m-%d")
-    return [log_file_name,
-            f'{latency_storage_path}/{current_date}-ping_latency_chart.png',
-            f'{success_storage_path}/{current_date}-ping_success_chart.png']
+    latency_chart_filename = f'{latency_storage_path}/{current_date}-ping_latency_chart.png'
+    success_chart_filename = f'{success_storage_path}/{current_date}-ping_success_chart.png'
+    return [log_file_name, latency_chart_filename, success_chart_filename]
     
-def attach_files_to_email(message, file_attachments):
+def _attach_files_to_message(message: MIMEMultipart, file_attachments: list[str]) -> None:
     for file in file_attachments:
         with open(file, "rb") as f:
             part = MIMEApplication(
@@ -40,10 +42,15 @@ def attach_files_to_email(message, file_attachments):
         part['Content-Disposition'] = 'attachment; filename="%s"' % basename(file)
         message.attach(part)
         
-def send_email(message):
-    with smtplib.SMTP(EmailInfo.smtp_server, EmailInfo.smtp_port) as server:
-        server.starttls()
-        server.login(EmailInfo.sender_email, EmailInfo.sender_password)
-        server.send_message(message)
-
-    print("Email sent successfully")
+def _send_email(message: MIMEMultipart) -> bool:
+    try:
+        with smtplib.SMTP(EmailInfo.smtp_server, EmailInfo.smtp_port) as server:
+            print(server)
+            server.starttls()
+            server.login(EmailInfo.sender_email, EmailInfo.sender_password)
+            server.send_message(message)
+        return True
+    
+    except Exception as e:
+        print(f"Failed to send email: {e}")
+        return False

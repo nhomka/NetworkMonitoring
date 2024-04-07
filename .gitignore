@@ -3,7 +3,8 @@
 *.pyc
 
 # Config Files
-EmailInfo.py
+emailinfo.py
+hostinfo.py
 
 # Test Development Files
 TESTFILE.py

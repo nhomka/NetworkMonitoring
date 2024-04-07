@@ -1,3 +1,5 @@
+from hostinfo import HostInfo
+
 class PingSettings:
     def __init__(self):
         self.pingAttempts = 4
@@ -5,5 +7,5 @@ class PingSettings:
         self.interval = 1
         self.packetSize = 32
         self.TTL = 128
-        self.host = "www.google.com"
+        self.host = HostInfo().hostname
         self.requiredSuccessfulPings = 1

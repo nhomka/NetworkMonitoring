@@ -1,6 +1,8 @@
 import platform, os
 from pingsettings import PingSettings
 
+# Project - understand how to better enforce this as an interface
+
 def get_pinger_class(pingsettings = PingSettings()):
     if platform.system().lower() == "windows":
         return WindowsPinger(pingsettings)
@@ -18,20 +20,10 @@ class Pinger:
         latency = self._get_latency(response) if success else 0
         return success, latency
 
-    #test-validated
-    def _get_ping_command(self):
-        pass
-
     def _send_ping_command(self, ping_command):
         response = os.popen(ping_command).read()
         print(response)
         return response
-
-    def _is_ping_successful(self, ping_response):
-        pass
-
-    def _get_latency(ping_str):
-        pass
     
 class WindowsPinger(Pinger):
     def __init__(self, pingsettings = PingSettings()):
