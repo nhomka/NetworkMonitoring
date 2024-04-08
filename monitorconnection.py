@@ -26,7 +26,7 @@ class NetworkMonitor:
 
             time.sleep(self.settings.interval)  # Wait for the remaining time in the interval
 
-    def _log_results(self, success, latency):
+    def _log_results(self, success: bool, latency: float) -> None:
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         with open(log_file_name, "a") as file:
-            file.write(f"{timestamp},{success},{latency}\n")
+            file.write(f"{timestamp},{success},{latency:0f}\n")
