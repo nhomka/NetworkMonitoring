@@ -1,12 +1,13 @@
 import datetime
 from freezegun import freeze_time
-import file_paths
+from configuration import FileSystemInfo
 import file_storage_configuration
 import os
 
-storage_directories = file_paths.storage_directories
-log_storage_path = file_paths.log_storage_path
-log_file_name = file_paths.log_file_name
+storage_directories = FileSystemInfo.STORAGE_DIRECTORIES
+log_storage_path = FileSystemInfo.LOG_STORAGE_PATH
+log_file_name = FileSystemInfo.LOG_FILE_NAME
+days_of_history = FileSystemInfo.DAYS_OF_HISTORY
 
 def test_on_creation_check_storage_directories(fs):
     for path in storage_directories:
@@ -17,9 +18,8 @@ def test_on_creation_check_storage_directories(fs):
 
 @freeze_time("2024-03-25")
 def test_delete_old_files_from_directory(fs):
-    days_of_history = file_paths.days_of_history_to_keep
     excess_days = 10
-    directory = file_paths.log_storage_path
+    directory = log_storage_path
     os.makedirs(directory)
     
     for i in range(0, days_of_history + excess_days):

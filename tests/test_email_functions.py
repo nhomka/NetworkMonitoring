@@ -1,18 +1,11 @@
 from email.mime.multipart import MIMEMultipart
-import platform
 import pytest, pyfakefs
 from unittest.mock import patch, MagicMock
 import os
 import datetime
-from monitorconnection import NetworkMonitor
 from freezegun import freeze_time
-import file_paths
-import file_storage_configuration
-from pingsettings import PingSettings
-import datetime_functions
-from pinger import get_pinger_class
-from emailinfo import EmailInfo
 import emailer
+from configuration import EmailInfo, FileSystemInfo as fs
 
 os.environ['ENV'] = 'test'
 # mockPingSettings = PingSettings()
@@ -25,21 +18,21 @@ os.environ['ENV'] = 'test'
 
 def test_build_email_message():
     test_message = emailer._build_email_message()
-    assert test_message['From'] == EmailInfo.sender_email
-    assert test_message['To'] == EmailInfo.receiver_email
-    assert test_message['Subject'] == EmailInfo.subject_line
-    assert test_message.get_payload()[0].get_payload() == EmailInfo.message_body
+    assert test_message['From'] == EmailInfo.SENDER_EMAIL
+    assert test_message['To'] == EmailInfo.RECIPIENT_EMAIL
+    assert test_message['Subject'] == EmailInfo.SUBJECT_LINE
+    assert test_message.get_payload()[0].get_payload() == EmailInfo.MESSAGE_BODY
     
 @freeze_time("2024-03-25")
 def test_get_file_attachments():
     current_date = datetime.datetime.now().strftime("%Y-%m-%d")
-    latency_chart_filename = f'{file_paths.latency_storage_path}/{current_date}-ping_latency_chart.png'
-    success_chart_filename = f'{file_paths.success_storage_path}/{current_date}-ping_success_chart.png'
+    latency_chart_filename = f'{fs.LATENCY_STORAGE_PATH}/{current_date}-ping_latency_chart.png'
+    success_chart_filename = f'{fs.SUCCESS_STORAGE_PATH}/{current_date}-ping_success_chart.png'
     
     attachments = emailer._get_file_attachments()
     
     assert len(attachments) == 3
-    assert file_paths.log_file_name in attachments
+    assert fs.LOG_FILE_NAME in attachments
     assert latency_chart_filename in attachments
     assert success_chart_filename in attachments
 

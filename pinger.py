@@ -24,6 +24,15 @@ class Pinger:
         response = os.popen(ping_command).read()
         print(response)
         return response
+        
+    def _get_ping_command(self) -> str:
+        raise NotImplementedError("Subclasses must implement this method")    
+        
+    def _is_ping_successful(self, ping_response: str) -> bool:
+        raise NotImplementedError("Subclasses must implement this method")
+    
+    def _get_latency(self, response: str) -> float:
+        raise NotImplementedError("Subclasses must implement this method")
     
 class WindowsPinger(Pinger):
     def __init__(self, pingsettings = PingSettings()):

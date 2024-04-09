@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 from datetime_functions import current_date_string
-from file_paths import plots_storage_path, log_file_name
+from configuration import FileSystemInfo as fs
 
 def build_charts() -> None:
     _build_latency_chart()
@@ -19,11 +19,11 @@ def _build_connection_chart() -> None:
     _save_plot('Success', df)
     
 def _build_dataframe_from_log() -> pd.DataFrame:
-    return pd.read_csv(log_file_name, sep=",", names=["timestamp", "status", "latency"])
+    return pd.read_csv(fs.LOG_FILE_NAME, sep=",", names=["timestamp", "status", "latency"])
     
 def _save_plot(plot_name: str, dataframe: pd.DataFrame) -> None:
     dataframe.plot(x='timestamp', y=plot_name.lower())
     plt.title(f'Ping {plot_name} Over Time')
     plt.xlabel('Timestamp')
     plt.ylabel(plot_name)
-    plt.savefig(f'{plots_storage_path}/{plot_name}/{current_date_string()}-ping_{plot_name.lower()}_chart.png')
+    plt.savefig(f'{fs.PLOTS_STORAGE_PATH}/{plot_name}/{current_date_string()}-ping_{plot_name.lower()}_chart.png')

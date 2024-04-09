@@ -1,7 +1,7 @@
 import time
 from datetime import datetime
 from pingsettings import PingSettings
-from file_paths import log_file_name
+from configuration import FileSystemInfo as fs
 from file_storage_configuration import clean_old_logs, move_log_file
 from datetime_functions import is_start_of_day
 from pinger import get_pinger_class
@@ -28,5 +28,5 @@ class NetworkMonitor:
 
     def _log_results(self, success: bool, latency: float) -> None:
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        with open(log_file_name, "a") as file:
+        with open(fs.LOG_FILE_NAME, "a") as file:
             file.write(f"{timestamp},{success},{latency:0f}\n")

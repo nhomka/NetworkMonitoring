@@ -1,11 +1,11 @@
+from configuration import EmailInfo
+from configuration import FileSystemInfo as fs
 from datetime import datetime
-import smtplib
 from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from emailinfo import EmailInfo
 from os.path import basename
-from file_paths import log_file_name, success_storage_path, latency_storage_path
+import smtplib
 
 def send_email_report():
     message = _build_email_message()
@@ -16,20 +16,20 @@ def send_email_report():
 # test-validated
 def _build_email_message() -> MIMEMultipart:
     message = MIMEMultipart()
-    message['From'] = EmailInfo.sender_email
-    message['To'] = EmailInfo.receiver_email
-    message['Subject'] = EmailInfo.subject_line
+    message['From'] = EmailInfo.SENDER_EMAIL
+    message['To'] = EmailInfo.RECIPIENT_EMAIL
+    message['Subject'] = EmailInfo.SUBJECT_LINE
 
-    body = EmailInfo.message_body
+    body = EmailInfo.MESSAGE_BODY
     message.attach(MIMEText(body, 'plain'))
     return message
     
 
 def _get_file_attachments() -> list[str]:
     current_date = datetime.now().strftime("%Y-%m-%d")
-    latency_chart_filename = f'{latency_storage_path}/{current_date}-ping_latency_chart.png'
-    success_chart_filename = f'{success_storage_path}/{current_date}-ping_success_chart.png'
-    return [log_file_name, latency_chart_filename, success_chart_filename]
+    latency_chart_filename = f'{fs.LATENCY_STORAGE_PATH}/{current_date}-ping_latency_chart.png'
+    success_chart_filename = f'{fs.SUCCESS_STORAGE_PATH}/{current_date}-ping_success_chart.png'
+    return [fs.LOG_FILE_NAME, latency_chart_filename, success_chart_filename]
     
 def _attach_files_to_message(message: MIMEMultipart, file_attachments: list[str]) -> None:
     for file in file_attachments:
@@ -44,10 +44,10 @@ def _attach_files_to_message(message: MIMEMultipart, file_attachments: list[str]
         
 def _send_email(message: MIMEMultipart) -> bool:
     try:
-        with smtplib.SMTP(EmailInfo.smtp_server, EmailInfo.smtp_port) as server:
+        with smtplib.SMTP(EmailInfo.SMTP_SERVER, EmailInfo.SMTP_PORT) as server:
             print(server)
             server.starttls()
-            server.login(EmailInfo.sender_email, EmailInfo.sender_password)
+            server.login(EmailInfo.SENDER_EMAIL, EmailInfo.SENDER_PASSWORD)
             server.send_message(message)
         return True
     
