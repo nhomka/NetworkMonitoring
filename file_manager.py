@@ -1,7 +1,7 @@
 import os
 from helper_functions import do_not_run_in_test
-from datetime_functions import current_date_string, date_to_remove_old_files, get_date_from_log_file
-from configuration import FileSystemInfo as fs
+from datetime_helper import current_date_string, date_to_remove_old_files, get_date_from_log_file
+from config.file_config import FileSystemInfo as fs
 
 @do_not_run_in_test    
 def initialize_storage() -> None:

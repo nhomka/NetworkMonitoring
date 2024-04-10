@@ -1,5 +1,5 @@
-from configuration import EmailInfo
-from configuration import FileSystemInfo as fs
+from config.email_config import EmailInfo
+from config.file_config import FileSystemInfo as fs
 from datetime import datetime
 from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart

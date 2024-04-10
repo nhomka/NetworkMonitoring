@@ -1,5 +1,5 @@
 from typing import Any
-from configuration import EmailInfo
+from config.file_config import EmailInfo
 
 class PingSettings:
     host = EmailInfo.HOST

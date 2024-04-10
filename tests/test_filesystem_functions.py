@@ -1,7 +1,7 @@
 import datetime
 from freezegun import freeze_time
-from configuration import FileSystemInfo
-import file_storage_configuration
+from config.file_config import FileSystemInfo
+import file_manager
 import os
 
 storage_directories = FileSystemInfo.STORAGE_DIRECTORIES
@@ -12,7 +12,7 @@ days_of_history = FileSystemInfo.DAYS_OF_HISTORY
 def test_on_creation_check_storage_directories(fs):
     for path in storage_directories:
         assert os.path.exists(path) == False
-    file_storage_configuration.check_storage_paths()
+    file_manager.check_storage_paths()
     for path in storage_directories:
         assert os.path.exists(path) == True 
 
@@ -30,7 +30,7 @@ def test_delete_old_files_from_directory(fs):
     
     # check that all files have been created
     assert len(os.listdir(directory)) == days_of_history + excess_days
-    file_storage_configuration.delete_old_files_from_directory(directory)
+    file_manager.delete_old_files_from_directory(directory)
     
     # check that n + 1 files remain in directory
     assert len(os.listdir(directory)) == days_of_history + 1
@@ -59,7 +59,7 @@ def test_move_log_file(fs):
     assert os.path.exists(origin_path) == False
     
     # Test when function is called and log file does not exist
-    file_storage_configuration.move_log_file()
+    file_manager.move_log_file()
     assert os.path.exists(destination_path) == False
     assert os.path.exists(origin_path) == False
     
@@ -69,6 +69,6 @@ def test_move_log_file(fs):
     assert os.path.exists(origin_path) == True
     
     # Test when function is called and log file exists
-    file_storage_configuration.move_log_file()
+    file_manager.move_log_file()
     assert os.path.exists(destination_path) == True
     assert os.path.exists(origin_path) == False

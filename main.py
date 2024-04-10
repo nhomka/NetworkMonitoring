@@ -1,6 +1,6 @@
 from monitorconnection import NetworkMonitor
-from pingsettings import PingSettings
-from file_storage_configuration import initialize_storage
+from config.pingsettings import PingSettings
+from file_manager import initialize_storage
 
 if __name__ == "__main__":
     settings = PingSettings()

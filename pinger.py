@@ -1,5 +1,5 @@
 import platform, os
-from pingsettings import PingSettings
+from config.pingsettings import PingSettings
 
 # Project - understand how to better enforce this as an interface
 

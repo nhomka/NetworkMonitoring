@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import pandas as pd
-from datetime_functions import current_date_string
-from configuration import FileSystemInfo as fs
+from datetime_helper import current_date_string
+from config.file_config import FileSystemInfo as fs
 
 def build_charts() -> None:
     _build_latency_chart()

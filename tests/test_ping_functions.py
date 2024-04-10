@@ -1,9 +1,9 @@
 import os
 import platform
 import pytest, pyfakefs
-from pingsettings import PingSettings
+from config.pingsettings import PingSettings
 from pinger import get_pinger_class
-from configuration import EmailInfo
+from config.file_config import EmailInfo
 
 os.environ['ENV'] = 'test'
 mockPingSettings = PingSettings()
