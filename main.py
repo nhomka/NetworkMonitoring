@@ -11,4 +11,4 @@ if __name__ == "__main__":
     initialize_storage()
 
     monitor = NetworkMonitor(settings)
-    monitor.monitor_connection()
+    monitor.monitor_connections()

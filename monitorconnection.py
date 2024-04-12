@@ -11,9 +11,9 @@ import plotter
 class NetworkMonitor:
     def __init__(self, pingsettings = PingSettings()):
         self.settings = pingsettings
-        self.pinger = get_pinger_class(self.settings)
+        self.pinger = get_pinger_class(self.settings.host)
 
-    def monitor_connection(self):
+    def monitor_connections(self):
         while True:
             success, latency = self.pinger.ping()
             self._log_results(success, latency)

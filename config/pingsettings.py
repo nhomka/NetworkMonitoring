@@ -1,8 +1,8 @@
 from typing import Any
-from config.file_config import EmailInfo
+from config.private_configuration import SMTPInfo
 
 class PingSettings:
-    host = EmailInfo.HOST
+    host = SMTPInfo.HOST
     
     def __init__(self):
         self.pingAttempts = 4
@@ -14,7 +14,7 @@ class PingSettings:
         
     def __setattr__(self, name: str, value: Any) -> None:
         if name == "host":
-            raise AttributeError("Host name must be changed through the private HostInfo class")
+            raise AttributeError("Host name must be changed through the private SMTPInfo class")
         super().__setattr__(name, value)
         
     def __str__(self) -> str:
