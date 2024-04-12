@@ -5,10 +5,11 @@ import os
 import datetime
 from freezegun import freeze_time
 import emailer
-from config.file_config import FileSystemInfo as file_system_info
+from config.file_config import FileSystemInfo
 from config.email_config import EmailInfo
 
 os.environ['ENV'] = 'test'
+file_system_info = FileSystemInfo()
 # mockPingSettings = PingSettings()
 # mockPinger = get_pinger_class(mockPingSettings)
 # mockNetworkMonitor = NetworkMonitor()
@@ -30,7 +31,7 @@ def test_get_file_attachments():
     latency_chart_filename = f'{file_system_info.LATENCY_STORAGE_PATH}/{current_date}-ping_latency_chart.png'
     success_chart_filename = f'{file_system_info.SUCCESS_STORAGE_PATH}/{current_date}-ping_success_chart.png'
     
-    attachments = emailer._get_file_attachments()
+    attachments = emailer._get_file_attachments(file_system_info)
     
     assert len(attachments) == 3
     assert file_system_info.LOG_FILE_NAME in attachments

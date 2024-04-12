@@ -1,5 +1,5 @@
 from config.email_config import EmailInfo
-from config.file_config import FileSystemInfo as fs
+from config.file_config import FileSystemInfo
 from datetime import datetime
 from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
@@ -7,9 +7,9 @@ from email.mime.text import MIMEText
 from os.path import basename
 import smtplib
 
-def send_email_report():
+def send_email_report(fs: FileSystemInfo):
     message = _build_email_message()
-    file_attachments = _get_file_attachments()
+    file_attachments = _get_file_attachments(fs)
     _attach_files_to_message(message, file_attachments)
     _send_email(message)
 
@@ -25,7 +25,7 @@ def _build_email_message() -> MIMEMultipart:
     return message
     
 
-def _get_file_attachments() -> list[str]:
+def _get_file_attachments(fs: FileSystemInfo) -> list[str]:
     current_date = datetime.now().strftime("%Y-%m-%d")
     latency_chart_filename = f'{fs.LATENCY_STORAGE_PATH}/{current_date}-ping_latency_chart.png'
     success_chart_filename = f'{fs.SUCCESS_STORAGE_PATH}/{current_date}-ping_success_chart.png'
