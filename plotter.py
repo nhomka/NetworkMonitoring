@@ -15,7 +15,7 @@ def _build_latency_chart(df: pd.DataFrame, fs: FileSystemInfo) -> None:
     
 def _build_connection_chart(df: pd.DataFrame, fs: FileSystemInfo) -> None:
     df['timestamp'] = pd.to_datetime(df['timestamp'])
-    df['success'] = df['status'].apply(lambda x: 1 if x == 'Success' else 0)
+    df['success'] = df['status'].apply(lambda x: 1 if x == 'True' else 0)
     _save_plot('Success', df, fs)
     
 def _build_dataframe_from_log(fs: FileSystemInfo) -> pd.DataFrame:
