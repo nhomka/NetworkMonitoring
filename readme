@@ -1,0 +1,7 @@
+This utility can be used to monitor the connections/availability of various different servers.
+
+In order to run, update the private_configuration file to include all addresses you would like to monitor.  You will also need to update the smtp info/e-mail addresses of any accounts you would like a report sent to.
+
+These servers will each be pinged on a regularly specified basis.  The results will be logged and distributed by e-mail once per day by default.
+
+I use it to simply keep track of home networks, but I envision it being a convenient tool for -- as an example -- people who rent out homes on airbnb, and would like a free way to ensure that the internet is available between stays.
