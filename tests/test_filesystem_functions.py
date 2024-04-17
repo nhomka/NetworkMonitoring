@@ -1,20 +1,21 @@
 import datetime
 from freezegun import freeze_time
 from config.file_config import FileSystemInfo
-import file_manager
+from storage_manager import StorageManager
 import os
 
 file_system_info = FileSystemInfo()
+storage_manager = StorageManager(file_system_info)
 
-storage_directories = FileSystemInfo.STORAGE_DIRECTORIES
-log_storage_path = FileSystemInfo.LOG_STORAGE_PATH
-log_file_name = FileSystemInfo.LOG_FILE_NAME
-days_of_history = FileSystemInfo.DAYS_OF_HISTORY
+storage_directories = file_system_info.STORAGE_DIRECTORIES
+log_storage_path = file_system_info.LOG_STORAGE_PATH
+log_file_name = file_system_info.LOG_FILE_NAME
+days_of_history = file_system_info.DAYS_OF_HISTORY
 
 def test_on_creation_check_storage_directories(fs):
     for path in storage_directories:
         assert os.path.exists(path) == False
-    file_manager.check_storage_paths(file_system_info)
+    storage_manager.check_storage_paths()
     for path in storage_directories:
         assert os.path.exists(path) == True 
 
@@ -32,7 +33,7 @@ def test_delete_old_files_from_directory(fs):
     
     # check that all files have been created
     assert len(os.listdir(directory)) == days_of_history + excess_days
-    file_manager._delete_old_files_from_directory(file_system_info, directory)
+    storage_manager._delete_old_files_from_directory(directory)
     
     # check that n + 1 files remain in directory
     assert len(os.listdir(directory)) == days_of_history + 1
@@ -61,7 +62,7 @@ def test_move_log_file(fs):
     assert os.path.exists(origin_path) == False
     
     # Test when function is called and log file does not exist
-    file_manager.move_log_file(file_system_info)
+    storage_manager.move_log_file()
     assert os.path.exists(destination_path) == False
     assert os.path.exists(origin_path) == False
     
@@ -71,6 +72,6 @@ def test_move_log_file(fs):
     assert os.path.exists(origin_path) == True
     
     # Test when function is called and log file exists
-    file_manager.move_log_file(file_system_info)
+    storage_manager.move_log_file()
     assert os.path.exists(destination_path) == True
     assert os.path.exists(origin_path) == False
