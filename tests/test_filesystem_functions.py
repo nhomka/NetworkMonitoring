@@ -15,7 +15,7 @@ days_of_history = file_system_info.DAYS_OF_HISTORY
 def test_on_creation_check_storage_directories(fs):
     for path in storage_directories:
         assert os.path.exists(path) == False
-    storage_manager.check_storage_paths()
+    storage_manager._check_storage_paths()
     for path in storage_directories:
         assert os.path.exists(path) == True 
 
@@ -62,7 +62,7 @@ def test_move_log_file(fs):
     assert os.path.exists(origin_path) == False
     
     # Test when function is called and log file does not exist
-    storage_manager.move_log_file()
+    storage_manager._archive_latest_log_file()
     assert os.path.exists(destination_path) == False
     assert os.path.exists(origin_path) == False
     
@@ -72,6 +72,6 @@ def test_move_log_file(fs):
     assert os.path.exists(origin_path) == True
     
     # Test when function is called and log file exists
-    storage_manager.move_log_file()
+    storage_manager._archive_latest_log_file()
     assert os.path.exists(destination_path) == True
     assert os.path.exists(origin_path) == False

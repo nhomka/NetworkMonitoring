@@ -1,7 +1,6 @@
 from monitorconnection import NetworkMonitor
 from config.pingsettings import PingSettings
 from config.private_configuration import SMTPInfo
-from config.file_config import FileSystemInfo as fs
 import time
 
 if __name__ == "__main__":
@@ -21,5 +20,7 @@ if __name__ == "__main__":
     while True:
         for monitor in monitors:
             monitor.monitor_connections()
-            
+        
+        # I need to not sleep - continuously run the loop and check within each monitor if it is time to ping
+        # Currently can't enforce custom intervals for each monitor
         time.sleep(60)
