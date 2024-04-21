@@ -1,5 +1,5 @@
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 from config.pingsettings import PingSettings
 from config.file_config import FileSystemInfo
 from storage_manager import StorageManager
@@ -18,8 +18,15 @@ class NetworkMonitor:
         self.plotter = Plotter(self.file_system_config)
         self.emailer = Emailer(self.file_system_config)
         self.storage_manager = StorageManager(self.file_system_config)
+        
+        self.last_ping_time = datetime.now()
 
     def monitor_connections(self):
+        if datetime.now() < self.last_ping_time + timedelta(seconds=self.settings.interval):
+            return
+        
+        self.last_ping_time = datetime.now()
+        
         success, latency = self.pinger.ping()
         self._log_results(success, latency)
 

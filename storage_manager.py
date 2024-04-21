@@ -21,7 +21,7 @@ class StorageManager:
     def clean_old_logs(self) -> None:
         self._archive_latest_log_file()
         for directory in self.fs.STORAGE_DIRECTORIES:
-            self._delete_old_files_from_directory(self.fs, directory)
+            self._delete_old_files_from_directory(directory)
 
     def _archive_latest_log_file(self) -> None:
         current_date = current_date_string()
