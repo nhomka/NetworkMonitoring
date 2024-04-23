@@ -2,8 +2,7 @@ import os
 import platform
 import pytest, pyfakefs
 from config.pingsettings import PingSettings
-from pinger import get_pinger_class
-from config.file_config import FileSystemInfo
+from src.pinger import get_pinger_class
 
 os.environ['ENV'] = 'test'
 mockPingSettings = PingSettings()

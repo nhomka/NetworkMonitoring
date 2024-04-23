@@ -1,6 +1,6 @@
 import os
-from helper_functions import do_not_run_in_test
-from datetime_util import current_date_string, date_to_remove_old_files, get_date_from_log_file
+from src.helper_functions import do_not_run_in_test
+from src.datetime_util import current_date_string, date_to_remove_old_files, get_date_from_log_file
 from config.file_config import FileSystemInfo
 
 class StorageManager:

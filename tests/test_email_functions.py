@@ -4,7 +4,7 @@ from unittest.mock import patch, MagicMock
 import os
 import datetime
 from freezegun import freeze_time
-from emailer import Emailer
+from src.emailer import Emailer
 from config.file_config import FileSystemInfo
 from config.email_config import EmailInfo
 
