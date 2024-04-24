@@ -1,7 +1,6 @@
 from src.network_monitor import NetworkMonitor
-from src.config.pingsettings import PingSettings
-from src.config.private_configuration import SMTPInfo
-import time
+from config.pingsettings import PingSettings
+from config.private_configuration import SMTPInfo
 
 if __name__ == "__main__":
     
